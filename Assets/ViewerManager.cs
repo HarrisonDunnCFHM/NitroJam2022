@@ -11,25 +11,41 @@ public class ViewerManager : MonoBehaviour
     [SerializeField] Viewer viewerPrefab;
     [SerializeField] float snapIncrement = 0.05f;
     [SerializeField] Text viewerCountText;
+    [SerializeField] Text viewersConsumedText;
 
 
     //cached refs
     public float snapDistance;
     public List<Viewer> allViewers;
+    public int viewersConsumed;
 
 
 
     // Start is called before the first frame update
     void Start()
     {
-        allViewers = new List<Viewer>();   
+        allViewers = new List<Viewer>();
+        viewersConsumed = 0;
     }
 
     // Update is called once per frame
     void Update()
     {
         snapDistance = Mathf.Log(allViewers.Count) * snapIncrement;
+        UpdateCounts();
+    }
+
+    private void UpdateCounts()
+    {
         viewerCountText.text = "Viewers: " + allViewers.Count.ToString();
+        if (viewersConsumed == 0)
+        {
+            viewersConsumedText.text = "";
+        }
+        else
+        {
+            viewersConsumedText.text = "Consumed: " + viewersConsumed;
+        }
     }
 
     public void SpawnViewer()

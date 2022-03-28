@@ -59,6 +59,7 @@ public class Viewer : MonoBehaviour
         myHead.GetComponent<Renderer>().enabled = false;
         myRenderer.enabled = false;
         GetComponent<Collider>().enabled = false;
+        viewerManager.viewersConsumed++;
         yield return new WaitForSeconds(3f);
         Destroy(newSplat);
         Destroy(gameObject);
