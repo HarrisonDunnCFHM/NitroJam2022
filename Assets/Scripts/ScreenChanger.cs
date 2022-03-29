@@ -16,6 +16,7 @@ public class ScreenChanger : MonoBehaviour
     [SerializeField] float brightnessAdjustSpeed = 1f;
     [SerializeField] float minFlickerCooldown = 0.01f;
     [SerializeField] float maxFlickerCooldown = 0.1f;
+    [SerializeField] List<GameObject> channelSprites;
 
     //cached references
     Material myMaterial;
@@ -23,6 +24,8 @@ public class ScreenChanger : MonoBehaviour
     public bool channelDisplayActive;
     float channelDisplayTimer;
     public int currentChannel;
+    int currentChannelSpriteIndex;
+    GameObject currentChannelSprite;
     
     // Start is called before the first frame update
     void Start()
@@ -32,6 +35,8 @@ public class ScreenChanger : MonoBehaviour
         channelDisplayActive = false;
         channelDisplay.text = "";
         channelDisplayTimer = 0f;
+        int currentChannelSpriteIndex = -1;
+        //currentChannelSprite = null;
     }
 
     // Update is called once per frame
@@ -39,6 +44,20 @@ public class ScreenChanger : MonoBehaviour
     {
         ChannelDisplayTimeOut();
         AdjustBrightness(); //adjusts brightness after flicker
+        ManageChannelSprite();
+    }
+
+    private void ManageChannelSprite()
+    {
+        //do I need this ???
+        //if(currentChannelSpriteIndex == -1)
+        //{
+        //  currentChannelSprite.SetActive(false);
+        //}
+        //else
+        //{
+        //    currentChannelSprite.SetActive(true);
+        //} 
     }
 
     private void ChannelDisplayTimeOut()
@@ -85,7 +104,8 @@ public class ScreenChanger : MonoBehaviour
     {
         currentChannel = channel;
         StartCoroutine(ScreenFlicker());
-        if(channel < 10)
+        RandomChannelSprite();
+        if (channel < 10)
         {
             ChangeToRed();
         }
@@ -125,5 +145,18 @@ public class ScreenChanger : MonoBehaviour
         screenGlow.color = Color.white;
     }
 
+    public void RandomChannelSprite()
+    {
+        int newChannelSpriteIndex = UnityEngine.Random.Range(0, channelSprites.Count);
+        while (newChannelSpriteIndex == currentChannelSpriteIndex)
+        {
+            newChannelSpriteIndex = UnityEngine.Random.Range(0, channelSprites.Count);
+        }
+        if(currentChannelSprite != null)
+        {
+            Destroy(currentChannelSprite);
+        }
+        currentChannelSprite = Instantiate(channelSprites[newChannelSpriteIndex], new Vector3(0f, 0f, -0.5f), Quaternion.identity);
+    }
     
 }
