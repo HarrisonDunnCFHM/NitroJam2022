@@ -6,12 +6,21 @@ using UnityEngine.UI;
 public class ViewerManager : MonoBehaviour
 {
     //config params
+    public enum InterestLevel { Low, Med, High, Ult };
     [SerializeField] float maxSpawnDist = 40;
     [SerializeField] float minSpawnDist = 17;
     [SerializeField] Viewer viewerPrefab;
     [SerializeField] float snapIncrement = 0.05f;
     [SerializeField] Text viewerCountText;
     [SerializeField] Text viewersConsumedText;
+    [SerializeField] int minLowInterest = 1;
+    [SerializeField] int maxLowInterest = 3;
+    [SerializeField] int minMedInterest = 4;
+    [SerializeField] int maxMedInterest = 9;
+    [SerializeField] int minHighInterest = 10;
+    [SerializeField] int maxHighInterest = 24;
+    [SerializeField] int minUltInterest = 25;
+    [SerializeField] int maxUltInterest = 100;
 
 
     //cached refs
@@ -63,5 +72,28 @@ public class ViewerManager : MonoBehaviour
         allViewers.Add(newViewer);
     }
 
+    private int GenerateViewersInterested(InterestLevel interest)
+    {
+        int viewersToGenerate;
+        switch(interest)
+        {
+            case InterestLevel.Low:
+                viewersToGenerate = Random.Range(minLowInterest, maxLowInterest + 1);
+                break;
+            case InterestLevel.Med:
+                viewersToGenerate = Random.Range(minMedInterest, maxMedInterest + 1);
+                break;
+            case InterestLevel.High:
+                viewersToGenerate = Random.Range(minHighInterest, maxHighInterest + 1);
+                break;
+            case InterestLevel.Ult:
+                viewersToGenerate = Random.Range(minUltInterest, maxUltInterest + 1);
+                break;
+            default:
+                viewersToGenerate = 0;
+                break;
+        }
+        return viewersToGenerate;
+    }
 
 }
