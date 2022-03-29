@@ -17,6 +17,7 @@ public class ScreenChanger : MonoBehaviour
     [SerializeField] float minFlickerCooldown = 0.01f;
     [SerializeField] float maxFlickerCooldown = 0.1f;
     [SerializeField] List<GameObject> channelSprites;
+    [SerializeField] List<Color> channelColors;
     [SerializeField] Canvas spriteCanvas;
 
     //cached references
@@ -26,7 +27,9 @@ public class ScreenChanger : MonoBehaviour
     float channelDisplayTimer;
     public int currentChannel;
     int currentChannelSpriteIndex;
+    int currentChannelColorIndex;
     GameObject currentChannelSprite;
+    public List<Color> savedColors;
     
     // Start is called before the first frame update
     void Start()
@@ -36,8 +39,7 @@ public class ScreenChanger : MonoBehaviour
         channelDisplayActive = false;
         channelDisplay.text = "";
         channelDisplayTimer = 0f;
-        int currentChannelSpriteIndex = -1;
-        //currentChannelSprite = null;
+        //savedColors = new List<Color>(100);
     }
 
     // Update is called once per frame
@@ -45,21 +47,8 @@ public class ScreenChanger : MonoBehaviour
     {
         ChannelDisplayTimeOut();
         AdjustBrightness(); //adjusts brightness after flicker
-        ManageChannelSprite();
     }
 
-    private void ManageChannelSprite()
-    {
-        //do I need this ???
-        //if(currentChannelSpriteIndex == -1)
-        //{
-        //  currentChannelSprite.SetActive(false);
-        //}
-        //else
-        //{
-        //    currentChannelSprite.SetActive(true);
-        //} 
-    }
 
     private void ChannelDisplayTimeOut()
     {
@@ -105,7 +94,13 @@ public class ScreenChanger : MonoBehaviour
     {
         currentChannel = channel;
         StartCoroutine(ScreenFlicker());
+        FullRandomChannelColor(channel);
         RandomChannelSprite();
+        //PickChannelFromNumer(channel);
+    }
+
+    private void PickChannelFromNumer(int channel)
+    {
         if (channel < 10)
         {
             ChangeToRed();
@@ -146,6 +141,18 @@ public class ScreenChanger : MonoBehaviour
         screenGlow.color = Color.white;
     }
 
+    public void CreateChannelSprite(int spriteIndex)
+    {
+        if (currentChannelSprite != null)
+        {
+            Destroy(currentChannelSprite);
+        }
+        currentChannelSprite = Instantiate(channelSprites[spriteIndex], transform.position, Quaternion.identity);
+        currentChannelSprite.transform.SetParent(spriteCanvas.transform, false);
+        currentChannelSprite.transform.localPosition = new Vector3(0f, 0f, -0.5f);
+        currentChannelSpriteIndex = spriteIndex;
+    }
+
     public void RandomChannelSprite()
     {
         int newChannelSpriteIndex = UnityEngine.Random.Range(0, channelSprites.Count);
@@ -159,10 +166,31 @@ public class ScreenChanger : MonoBehaviour
         }
         currentChannelSprite = Instantiate(channelSprites[newChannelSpriteIndex], transform.position, Quaternion.identity);
         currentChannelSprite.transform.SetParent(spriteCanvas.transform, false);
-        //currentChannelSprite.transform.parent = spriteCanvas.transform;
         currentChannelSprite.transform.localPosition = new Vector3(0f, 0f, -0.5f);
-        //currentChannelSprite.transform.localScale = new Vector3(1f, 1f, 1f);
         currentChannelSpriteIndex = newChannelSpriteIndex;
     }
-    
+    public void RandomChannelColor()
+    {
+        int newChannelColorIndex = UnityEngine.Random.Range(0, channelColors.Count);
+        while (newChannelColorIndex == currentChannelColorIndex)
+        {
+            newChannelColorIndex = UnityEngine.Random.Range(0, channelSprites.Count);
+        }
+        currentChannelColorIndex = newChannelColorIndex;
+        myMaterial.color = channelColors[newChannelColorIndex];
+        screenGlow.color = channelColors[newChannelColorIndex];
+    }
+    public void FullRandomChannelColor(int channel)
+    {
+        if (savedColors[channel] == new Color (0f,0f,0f,0f))
+        {
+            float newR = UnityEngine.Random.Range(0f, 1f);
+            float newG = UnityEngine.Random.Range(0f, 1f);
+            float newB = UnityEngine.Random.Range(0f, 1f);
+            Color newColor = new Color (newR, newG, newB);
+            savedColors[channel] = newColor;
+        }
+        myMaterial.color = savedColors[channel];
+        screenGlow.color = savedColors[channel];
+    }
 }
