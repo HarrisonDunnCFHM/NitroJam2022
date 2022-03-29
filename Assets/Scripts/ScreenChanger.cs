@@ -17,6 +17,7 @@ public class ScreenChanger : MonoBehaviour
     [SerializeField] float minFlickerCooldown = 0.01f;
     [SerializeField] float maxFlickerCooldown = 0.1f;
     [SerializeField] List<GameObject> channelSprites;
+    [SerializeField] Canvas spriteCanvas;
 
     //cached references
     Material myMaterial;
@@ -156,7 +157,12 @@ public class ScreenChanger : MonoBehaviour
         {
             Destroy(currentChannelSprite);
         }
-        currentChannelSprite = Instantiate(channelSprites[newChannelSpriteIndex], new Vector3(0f, 0f, -0.5f), Quaternion.identity);
+        currentChannelSprite = Instantiate(channelSprites[newChannelSpriteIndex], transform.position, Quaternion.identity);
+        currentChannelSprite.transform.SetParent(spriteCanvas.transform, false);
+        //currentChannelSprite.transform.parent = spriteCanvas.transform;
+        currentChannelSprite.transform.localPosition = new Vector3(0f, 0f, -0.5f);
+        //currentChannelSprite.transform.localScale = new Vector3(1f, 1f, 1f);
+        currentChannelSpriteIndex = newChannelSpriteIndex;
     }
     
 }

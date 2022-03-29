@@ -3729,6 +3729,7 @@ MonoBehaviour:
   - {fileID: 2789811744847945931, guid: e096704b6a925434487b5eadf14d59f7, type: 3}
   - {fileID: 2860317154229177150, guid: 094b98b87f7a6e1459d5d97260d8d9ef, type: 3}
   - {fileID: 4928831934716914544, guid: 85de4de94010f7446984192094477abd, type: 3}
+  spriteCanvas: {fileID: 1264380639}
   channelDisplayActive: 0
   currentChannel: -1
 --- !u!1 &1172349655
