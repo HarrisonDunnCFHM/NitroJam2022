@@ -19,6 +19,7 @@ public class ScreenChanger : MonoBehaviour
     [SerializeField] List<GameObject> channelSprites;
     [SerializeField] List<Color> channelColors;
     [SerializeField] Canvas spriteCanvas;
+    [SerializeField] int startingChannel = 0;
 
     //cached references
     Material myMaterial;
@@ -39,12 +40,14 @@ public class ScreenChanger : MonoBehaviour
         channelDisplayActive = false;
         channelDisplay.text = "";
         channelDisplayTimer = 0f;
+        ChangeChannel(startingChannel);
         //savedColors = new List<Color>(100);
     }
 
     // Update is called once per frame
     void Update()
     {
+        screenGlow.color = myMaterial.color;
         ChannelDisplayTimeOut();
         AdjustBrightness(); //adjusts brightness after flicker
     }
@@ -122,23 +125,19 @@ public class ScreenChanger : MonoBehaviour
     public void ChangeToRed()
     {
         myMaterial.color = Color.red;
-        screenGlow.color = Color.red;
     }
     public void ChangeToBlue()
     {
         myMaterial.color = Color.blue;
-        screenGlow.color = Color.blue;
     }
     public void ChangeToGreen()
     {
         myMaterial.color = Color.green;
-        screenGlow.color = Color.green;
     }
 
     public void ClearColor()
     {
         myMaterial.color = Color.white;
-        screenGlow.color = Color.white;
     }
 
     public void CreateChannelSprite(int spriteIndex)
@@ -178,19 +177,18 @@ public class ScreenChanger : MonoBehaviour
         }
         currentChannelColorIndex = newChannelColorIndex;
         myMaterial.color = channelColors[newChannelColorIndex];
-        screenGlow.color = channelColors[newChannelColorIndex];
     }
     public void FullRandomChannelColor(int channel)
     {
         if (savedColors[channel] == new Color (0f,0f,0f,0f))
         {
+            UnityEngine.Random.Equals("Red", "Blue");
             float newR = UnityEngine.Random.Range(0f, 1f);
             float newG = UnityEngine.Random.Range(0f, 1f);
             float newB = UnityEngine.Random.Range(0f, 1f);
-            Color newColor = new Color (newR, newG, newB);
+            Color newColor = UnityEngine.Random.ColorHSV(0f,1f,0.7f,1f,0.7f,1f);
             savedColors[channel] = newColor;
         }
         myMaterial.color = savedColors[channel];
-        screenGlow.color = savedColors[channel];
     }
 }

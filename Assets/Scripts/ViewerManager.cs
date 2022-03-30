@@ -7,6 +7,7 @@ public class ViewerManager : MonoBehaviour
 {
     //config params
     public enum InterestLevel { Low, Med, High, Ult };
+    
     [SerializeField] float maxSpawnDist = 40;
     [SerializeField] float minSpawnDist = 17;
     [SerializeField] Viewer viewerPrefab;
@@ -21,12 +22,20 @@ public class ViewerManager : MonoBehaviour
     [SerializeField] int maxHighInterest = 24;
     [SerializeField] int minUltInterest = 25;
     [SerializeField] int maxUltInterest = 100;
+    [SerializeField] float maxSpawnTimer = 3f;
+    [SerializeField] float minSpawnTimer = 0.01f;
+    [SerializeField] float spawnRateIncrease = 0.1f;
 
 
     //cached refs
     public float snapDistance;
     public List<Viewer> allViewers;
     public int viewersConsumed;
+    public int hypeChannel;
+    public float currentSpawnTimerMax;
+    public float spawnTimer;
+    Mouth mouth;
+    ScreenChanger screen;
 
 
 
@@ -35,13 +44,67 @@ public class ViewerManager : MonoBehaviour
     {
         allViewers = new List<Viewer>();
         viewersConsumed = 0;
+        RandomizeHypeChannel();
+        mouth = FindObjectOfType<Mouth>();
+        screen = FindObjectOfType<ScreenChanger>();
+        currentSpawnTimerMax = maxSpawnTimer;
     }
+
 
     // Update is called once per frame
     void Update()
     {
         snapDistance = Mathf.Log(allViewers.Count) * snapIncrement;
+        AssessHype();
+        SpawnTimer();
         UpdateCounts();
+    }
+
+    private void AssessHype()
+    {
+        int distFromHype = Mathf.Abs(hypeChannel - screen.currentChannel);
+        if (distFromHype > 50)
+        {
+            if (hypeChannel > screen.currentChannel)
+            {
+                distFromHype = (100 - hypeChannel) + (screen.currentChannel);
+                Debug.Log("Hype is higher than current - " + distFromHype + " channels away.");
+            }
+            else if (hypeChannel < screen.currentChannel)
+            {
+                distFromHype = hypeChannel + (100 - screen.currentChannel);
+                Debug.Log("Current is higher than hype - " + distFromHype + " channels away.");
+            }
+        }
+        float newSpawnRate = maxSpawnTimer * ((float)distFromHype / 50);
+        Debug.Log("new spawn rate should be " + newSpawnRate);
+        if (newSpawnRate < minSpawnTimer)
+        {
+            newSpawnRate = minSpawnTimer;
+        }
+        currentSpawnTimerMax = newSpawnRate;
+    }
+
+    private void SpawnTimer()
+    {
+        if (spawnTimer <= currentSpawnTimerMax)
+        {
+            spawnTimer += Time.deltaTime * mouth.hungerSpeed;
+        }
+        else
+        {
+            SpawnViewer();
+            spawnTimer = 0;
+        }
+    }
+    public void RandomizeHypeChannel()
+    {
+        int newHypeChannel = UnityEngine.Random.Range(0,100);
+        while (newHypeChannel == hypeChannel)
+        {
+            newHypeChannel = UnityEngine.Random.Range(0, 100);
+        }
+        hypeChannel = newHypeChannel;
     }
 
     private void UpdateCounts()

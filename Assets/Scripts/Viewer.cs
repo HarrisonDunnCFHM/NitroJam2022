@@ -14,15 +14,18 @@ public class Viewer : MonoBehaviour
     //cached references
     public float targetX;
     public float targetZ;
+    Vector3 startPos;
     Vector3 targetPoint;
     Vector3 targetDirection;
     public bool moving;
+    public bool runningAway;
     ViewerManager viewerManager;
     Renderer myRenderer;
     
     // Start is called before the first frame update
     void Start()
     {
+        startPos = transform.position;
         myRenderer = GetComponent<Renderer>();
         viewerManager = FindObjectOfType<ViewerManager>();
         moving = true;
@@ -34,6 +37,7 @@ public class Viewer : MonoBehaviour
     void Update()
     {
         MoveToTarget();
+        RunAway();
     }
 
     private void MoveToTarget()
@@ -48,6 +52,24 @@ public class Viewer : MonoBehaviour
             {
                 //transform.localPosition = new Vector3(targetPoint.x, targetPoint.y, targetPoint.z);
                 moving = false;
+            }
+        }
+    }
+
+    private void RunAway()
+    {
+        if (runningAway)
+        {
+            moving = false;
+            targetDirection = startPos - transform.localPosition;
+            transform.Translate(targetDirection * moveSpeed * Time.deltaTime);
+            //viewerBody.velocity = targetDirection * moveSpeed * Time.deltaTime;
+            float distFromHome = Vector3.Magnitude(transform.localPosition - startPos);
+            if (distFromHome <= 2f)
+            {
+                //transform.localPosition = new Vector3(targetPoint.x, targetPoint.y, targetPoint.z);
+                viewerManager.allViewers.Remove(this);
+                Destroy(gameObject);
             }
         }
     }

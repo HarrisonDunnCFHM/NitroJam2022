@@ -6,11 +6,13 @@ public class Mouth : MonoBehaviour
 {
     //config params
     [SerializeField] Light screenGlow;
+    [SerializeField] public float hungerSpeed = 1f;
     
     //cached refs
     Animator myAnimator;
     SpriteRenderer myRenderer;
     ViewerManager viewerManager;
+
 
     // Start is called before the first frame update
     void Start()
@@ -33,19 +35,20 @@ public class Mouth : MonoBehaviour
 
     public void EatHalf()
     {
-        float removeViewers = Mathf.Ceil((viewerManager.allViewers.Count + 1)/ 2);
-        StartCoroutine(RemoveViewers(removeViewers));
+        StartCoroutine(RemoveViewers());
     }
 
-    IEnumerator RemoveViewers(float viewersToRemove)
+    IEnumerator RemoveViewers()
     {
-        if (viewerManager.allViewers.Count < viewersToRemove || viewersToRemove == 0) { Debug.Log("not enough to eat"); yield return null; }
+        float removeViewers = Mathf.Ceil((viewerManager.allViewers.Count + 1)/ 2);
+        if (viewerManager.allViewers.Count < removeViewers || removeViewers == 0) { Debug.Log("not enough to eat"); yield return null; }
         else if (myAnimator.GetCurrentAnimatorStateInfo(0).IsName("Mouth Chomp")) { Debug.Log("ALREADY EATING"); yield return null; }
         else
         {
+            viewerManager.RandomizeHypeChannel();
             Chomp();
             yield return new WaitForSeconds(0.75f);
-            for (int i = 0; i < viewersToRemove; i++)
+            for (int i = 0; i < removeViewers; i++)
             {
                 Viewer viewerToRemove = viewerManager.allViewers[0];
                 viewerManager.allViewers.Remove(viewerToRemove);
@@ -53,8 +56,9 @@ public class Mouth : MonoBehaviour
             }
             foreach(Viewer viewer in viewerManager.allViewers)
             {
-                viewer.moving = true;
+                viewer.runningAway = true;
+                //viewer.moving = true;
             }
-        }
+                   }
     }
 }
