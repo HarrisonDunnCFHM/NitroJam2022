@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,6 +13,7 @@ public class Mouth : MonoBehaviour
     Animator myAnimator;
     SpriteRenderer myRenderer;
     ViewerManager viewerManager;
+    ScoreManager scoreManager;
 
 
     // Start is called before the first frame update
@@ -20,18 +22,30 @@ public class Mouth : MonoBehaviour
         myAnimator = GetComponent<Animator>();
         myRenderer = GetComponent<SpriteRenderer>();
         viewerManager = FindObjectOfType<ViewerManager>();
+        scoreManager = FindObjectOfType<ScoreManager>();
     }
 
     // Update is called once per frame
     void Update()
     {
         myRenderer.material.color = screenGlow.color;
+        ProcessInput();
+    }
+
+    private void ProcessInput()
+    {
+        if(Input.GetKeyDown(KeyCode.Space))
+        {
+            EatHalf();
+        }
     }
 
     public void Chomp()
     {
         myAnimator.Play("Mouth Chomp");
     }
+
+    
 
     public void EatHalf()
     {
@@ -48,6 +62,7 @@ public class Mouth : MonoBehaviour
             viewerManager.RandomizeHypeChannel();
             Chomp();
             yield return new WaitForSeconds(0.75f);
+            scoreManager.gameStarted = true;
             for (int i = 0; i < removeViewers; i++)
             {
                 Viewer viewerToRemove = viewerManager.allViewers[0];
