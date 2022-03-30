@@ -36,6 +36,7 @@ public class ViewerManager : MonoBehaviour
     public float spawnTimer;
     Mouth mouth;
     ScreenChanger screen;
+    ScoreManager scoreManager;
 
 
 
@@ -48,6 +49,7 @@ public class ViewerManager : MonoBehaviour
         mouth = FindObjectOfType<Mouth>();
         screen = FindObjectOfType<ScreenChanger>();
         currentSpawnTimerMax = maxSpawnTimer;
+        scoreManager = FindObjectOfType<ScoreManager>();
     }
 
 
@@ -87,6 +89,7 @@ public class ViewerManager : MonoBehaviour
 
     private void SpawnTimer()
     {
+        if (!scoreManager.clickedStart || scoreManager.lossTriggered) { return; }
         if (spawnTimer <= currentSpawnTimerMax)
         {
             spawnTimer += Time.deltaTime * mouth.hungerSpeed;

@@ -2,40 +2,34 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class ScoreManager : MonoBehaviour
 {
     //config params
     [SerializeField] Text timerText;
-    [SerializeField] Slider angerMeter;
+    [SerializeField] public Slider angerMeter;
     [SerializeField] float mouthScale = 2f;
     [SerializeField] Image blackScreen;
     [SerializeField] float fadeSpeed = 1f;
     [SerializeField] Text gameOverText;
     [SerializeField] Text consumedCount;
     [SerializeField] Button start;
+    [SerializeField] Button restart;
+    [SerializeField] float angerSpeed = 2f;
+    [SerializeField] public float scoreMultiplier = 2f;
+    [SerializeField] float angerDivisor = 2f;
 
     //cached refs
     float currentTimer;
     public bool gameStarted;
     Mouth mouth;
-    bool lossTriggered;
-    bool clickedStart;
+    public bool lossTriggered;
+    public bool clickedStart;
     bool angerActive;
-
-    private void Awake()
-    {
-        int numberOfManagers = FindObjectsOfType<ScoreManager>().Length;
-        if (numberOfManagers > 1)
-        {
-            gameObject.SetActive(false);
-            Destroy(gameObject);
-        }
-        else
-        {
-            DontDestroyOnLoad(gameObject);
-        }
-    }
+    public int chompCount;
+    public bool chomping;
+   
 
     // Start is called before the first frame update
     void Start()
@@ -48,6 +42,9 @@ public class ScoreManager : MonoBehaviour
         clickedStart = false;
         angerMeter.gameObject.SetActive(false);
         angerActive = false;
+        restart.gameObject.SetActive(false);
+        chompCount = 0;
+        chomping = false;
     }
 
 
@@ -65,10 +62,14 @@ public class ScoreManager : MonoBehaviour
             currentTimer += Time.deltaTime;
             var timerAsText = FormatTime(currentTimer);
             timerText.text = timerAsText;
-            angerMeter.value += Time.deltaTime; 
+            if (!chomping)
+            {
+                angerMeter.value += Time.deltaTime * Mathf.Pow(angerSpeed, (chompCount / angerDivisor));
+            }
         }
         CheckForLoss();
     }
+
     private void FadeInScreen()
     {
         if (lossTriggered || !clickedStart) { return; }
@@ -82,6 +83,11 @@ public class ScoreManager : MonoBehaviour
     {
         clickedStart = true;
         start.gameObject.SetActive(false);
+    }
+
+    public void Reset()
+    {
+        SceneManager.LoadScene(0);
     }
 
     private void CheckForLoss()
@@ -110,6 +116,8 @@ public class ScoreManager : MonoBehaviour
         consumedCount.gameObject.transform.SetParent(blackScreen.gameObject.transform);
         yield return new WaitForSeconds(1f);
         timerText.gameObject.transform.SetParent(blackScreen.gameObject.transform);
+        yield return new WaitForSeconds(1f);
+        restart.gameObject.SetActive(true);
     }
 
     private string FormatTime(float time)

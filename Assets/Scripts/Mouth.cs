@@ -49,6 +49,7 @@ public class Mouth : MonoBehaviour
 
     public void EatHalf()
     {
+        if (!scoreManager.clickedStart || scoreManager.lossTriggered) { return; }
         StartCoroutine(RemoveViewers());
     }
 
@@ -59,10 +60,13 @@ public class Mouth : MonoBehaviour
         else if (myAnimator.GetCurrentAnimatorStateInfo(0).IsName("Mouth Chomp")) { Debug.Log("ALREADY EATING"); yield return null; }
         else
         {
+            scoreManager.chomping = true;
             viewerManager.RandomizeHypeChannel();
             Chomp();
             yield return new WaitForSeconds(0.75f);
             scoreManager.gameStarted = true;
+            scoreManager.angerMeter.value -= removeViewers * scoreManager.scoreMultiplier;
+            scoreManager.chompCount++;
             for (int i = 0; i < removeViewers; i++)
             {
                 Viewer viewerToRemove = viewerManager.allViewers[0];
@@ -74,6 +78,7 @@ public class Mouth : MonoBehaviour
                 viewer.runningAway = true;
                 //viewer.moving = true;
             }
-                   }
+            scoreManager.chomping = false;
+        }
     }
 }

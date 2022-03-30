@@ -12,12 +12,14 @@ public class RemoteControl : MonoBehaviour
 
     //cachced refs
     ScreenChanger screen;
+    ScoreManager scoreManager;
 
     // Start is called before the first frame update
     void Start()
     {
         //remoteControlDisplay.text = "";
         screen = FindObjectOfType<ScreenChanger>();
+        scoreManager = FindObjectOfType<ScoreManager>();
     }
 
     // Update is called once per frame
@@ -28,6 +30,7 @@ public class RemoteControl : MonoBehaviour
 
     private void KeyBoardInput()
     {
+        if (!scoreManager.clickedStart || scoreManager.lossTriggered) { return; }
         if (Input.GetKeyDown(KeyCode.Keypad1) || Input.GetKeyDown(KeyCode.Alpha1))
         {
             EnterDigit(1);
