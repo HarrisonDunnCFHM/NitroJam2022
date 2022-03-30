@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,10 +10,12 @@ public class RemoteControl : MonoBehaviour
     //[SerializeField] Text remoteControlDisplay;
     [SerializeField] Text screenChannelDisplay;
     [SerializeField] int maxDigits = 2;
+    [SerializeField] List<AudioClip> clicks;
 
     //cachced refs
     ScreenChanger screen;
     ScoreManager scoreManager;
+    AudioManager audioManager;
 
     // Start is called before the first frame update
     void Start()
@@ -20,6 +23,7 @@ public class RemoteControl : MonoBehaviour
         //remoteControlDisplay.text = "";
         screen = FindObjectOfType<ScreenChanger>();
         scoreManager = FindObjectOfType<ScoreManager>();
+        audioManager = FindObjectOfType<AudioManager>();
     }
 
     // Update is called once per frame
@@ -83,6 +87,13 @@ public class RemoteControl : MonoBehaviour
         {
             SurfChannel(-1);
         }
+        
+    }
+
+    private void PlaySound(List<AudioClip> clipList)
+    {
+        int pickedSound = UnityEngine.Random.Range(0, clipList.Count);
+        AudioSource.PlayClipAtPoint(clipList[pickedSound], Camera.main.transform.position, audioManager.masterVolume);
     }
 
     public void EnterDigit(int digit)
@@ -97,7 +108,7 @@ public class RemoteControl : MonoBehaviour
         {
             screenChannelDisplay.text = Mathf.Abs(int.Parse(screenChannelDisplay.text)) + digit.ToString();
         }
-
+        PlaySound(clicks);
     }
 
     public void SubmitChannel()
@@ -111,6 +122,7 @@ public class RemoteControl : MonoBehaviour
         {
             screenChannelDisplay.text = Mathf.Abs(int.Parse(screenChannelDisplay.text)).ToString();
         }
+        PlaySound(clicks);
     }
 
     public void SurfChannel(int upOrDown)

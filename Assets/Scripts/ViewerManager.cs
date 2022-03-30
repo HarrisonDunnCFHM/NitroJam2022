@@ -7,7 +7,8 @@ public class ViewerManager : MonoBehaviour
 {
     //config params
     public enum InterestLevel { Low, Med, High, Ult };
-    
+
+    [SerializeField] int mouthAwakeThreshold = 20;
     [SerializeField] float maxSpawnDist = 40;
     [SerializeField] float minSpawnDist = 17;
     [SerializeField] Viewer viewerPrefab;
@@ -112,6 +113,10 @@ public class ViewerManager : MonoBehaviour
 
     private void UpdateCounts()
     {
+        if (allViewers.Count >= mouthAwakeThreshold)
+        {
+            scoreManager.gameStarted = true;
+        }
         viewerCountText.text = "Viewers: " + allViewers.Count.ToString();
         if (viewersConsumed == 0)
         {

@@ -19,6 +19,7 @@ public class ScoreManager : MonoBehaviour
     [SerializeField] float angerSpeed = 2f;
     [SerializeField] public float scoreMultiplier = 2f;
     [SerializeField] float angerDivisor = 2f;
+    [SerializeField] float viewerDivisor = 10f;
 
     //cached refs
     float currentTimer;
@@ -29,6 +30,7 @@ public class ScoreManager : MonoBehaviour
     bool angerActive;
     public int chompCount;
     public bool chomping;
+    ViewerManager viewerManager;
    
 
     // Start is called before the first frame update
@@ -45,6 +47,7 @@ public class ScoreManager : MonoBehaviour
         restart.gameObject.SetActive(false);
         chompCount = 0;
         chomping = false;
+        viewerManager = FindObjectOfType<ViewerManager>();
     }
 
 
@@ -64,7 +67,16 @@ public class ScoreManager : MonoBehaviour
             timerText.text = timerAsText;
             if (!chomping)
             {
-                angerMeter.value += Time.deltaTime * Mathf.Pow(angerSpeed, (chompCount / angerDivisor));
+                // Manage Anger Increase
+                float viewers = viewerManager.allViewers.Count;
+                if (chompCount == 0)
+                {
+                    angerMeter.value += Time.deltaTime * (viewers / 2);
+                }
+                else
+                {
+                    angerMeter.value += Time.deltaTime * Mathf.Pow(angerSpeed * (1 + (viewers / viewerDivisor)), (chompCount / angerDivisor));
+                }
             }
         }
         CheckForLoss();

@@ -10,6 +10,8 @@ public class Viewer : MonoBehaviour
     [SerializeField] float defaultY = 0.8f;
     [SerializeField] ParticleSystem mySplat;
     [SerializeField] GameObject myHead;
+    [SerializeField] List<AudioClip> oohs;
+    [SerializeField] List<AudioClip> ohNos;
     
     //cached references
     public float targetX;
@@ -21,6 +23,9 @@ public class Viewer : MonoBehaviour
     public bool runningAway;
     ViewerManager viewerManager;
     Renderer myRenderer;
+    AudioManager audioManager;
+    bool oohed;
+    bool ohNoed;
     
     // Start is called before the first frame update
     void Start()
@@ -31,6 +36,8 @@ public class Viewer : MonoBehaviour
         moving = true;
         transform.localPosition = new Vector3 (transform.localPosition.x, defaultY, transform.localPosition.z);
         targetPoint = new Vector3(targetX, defaultY, targetZ);
+        audioManager = FindObjectOfType<AudioManager>();
+        oohed = false;
     }
 
     // Update is called once per frame
@@ -51,15 +58,30 @@ public class Viewer : MonoBehaviour
             if (distFromTarget <= viewerManager.snapDistance)
             {
                 //transform.localPosition = new Vector3(targetPoint.x, targetPoint.y, targetPoint.z);
+                if(!oohed)
+                {
+                    PlaySound(oohs);
+                    oohed = true;
+                }
                 moving = false;
             }
         }
+    }
+    private void PlaySound(List<AudioClip> clipList)
+    {
+        int pickedSound = UnityEngine.Random.Range(0, clipList.Count);
+        AudioSource.PlayClipAtPoint(clipList[pickedSound], Camera.main.transform.position, audioManager.masterVolume);
     }
 
     private void RunAway()
     {
         if (runningAway)
         {
+            if(!ohNoed)
+            {
+                PlaySound(ohNos);
+                ohNoed = true;
+            }
             moving = false;
             targetDirection = startPos - transform.localPosition;
             transform.Translate(targetDirection * moveSpeed * Time.deltaTime);
